@@ -1,40 +1,41 @@
-# High-Level Package Diagram – HBnB Evolution
-
-## Architecture Overview
-
-```mermaid
 classDiagram
 
-package "Presentation Layer" {
-    class API {
-        <<Interface>>
-        +handleRequests()
-        +sendResponses()
-    }
+class API {
+    <<Presentation>>
+    +handleRequests()
+    +sendResponses()
 }
 
-package "Business Logic Layer" {
-    class HBnBFacade {
-        <<Facade>>
-        +createUser()
-        +createPlace()
-        +createReview()
-        +listPlaces()
-    }
-
-    class User
-    class Place
-    class Review
-    class Amenity
+class HBnBFacade {
+    <<Facade>>
+    +createUser()
+    +createPlace()
+    +createReview()
+    +listPlaces()
 }
 
-package "Persistence Layer" {
-    class Repository {
-        +save()
-        +update()
-        +delete()
-        +find()
-    }
+class User {
+    <<BusinessLogic>>
+}
+
+class Place {
+    <<BusinessLogic>>
+}
+
+class Review {
+    <<BusinessLogic>>
+}
+
+class Amenity {
+    <<BusinessLogic>>
+}
+
+class Repository {
+    <<Persistence>>
+    +save()
+    +update()
+    +delete()
+    +find()
 }
 
 API --> HBnBFacade : uses
