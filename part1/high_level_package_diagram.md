@@ -1,46 +1,59 @@
 classDiagram
 
-class API {
-    <<Presentation>>
-    +handleRequests()
-    +sendResponses()
-}
-
-class HBnBFacade {
-    <<Facade>>
-    +createUser()
-    +createPlace()
-    +createReview()
-    +listPlaces()
+class BaseEntity {
+    +UUID id
+    +DateTime created_at
+    +DateTime updated_at
 }
 
 class User {
-    <<BusinessLogic>>
+    +String first_name
+    +String last_name
+    +String email
+    +String password
+    +Boolean is_admin
+
+    +create()
+    +update()
+    +delete()
 }
 
 class Place {
-    <<BusinessLogic>>
+    +String title
+    +String description
+    +Float price
+    +Float latitude
+    +Float longitude
+
+    +create()
+    +update()
+    +delete()
 }
 
 class Review {
-    <<BusinessLogic>>
+    +Integer rating
+    +String comment
+
+    +create()
+    +update()
+    +delete()
 }
 
 class Amenity {
-    <<BusinessLogic>>
-}
+    +String name
+    +String description
 
-class Repository {
-    <<Persistence>>
-    +save()
+    +create()
     +update()
     +delete()
-    +find()
 }
 
-API --> HBnBFacade : uses
-HBnBFacade --> User : manages
-HBnBFacade --> Place : manages
-HBnBFacade --> Review : manages
-HBnBFacade --> Amenity : manages
-HBnBFacade --> Repository : persists data
+BaseEntity <|-- User
+BaseEntity <|-- Place
+BaseEntity <|-- Review
+BaseEntity <|-- Amenity
+
+User "1" --> "0..*" Place : owns
+User "1" --> "0..*" Review : writes
+Place "1" --> "0..*" Review : has
+Place "0..*" -- "0..*" Amenity : includes
