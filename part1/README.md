@@ -1,4 +1,5 @@
-# HBnB # Task 1: Detailed Class Diagram for Business Logic Layer
+# Task 1: Detailed Class Diagram for Business Logic Layer
+
 ## Objective
 
 This diagram represents the internal structure of the Business Logic layer of the HBnB application, showing the core entities, their attributes, methods, and relationships.
