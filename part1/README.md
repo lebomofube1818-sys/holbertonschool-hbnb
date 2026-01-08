@@ -1,15 +1,13 @@
-# HBnB – Technical Architecture Documentation
+# HBnB Technical Documentation
 
 ## Introduction
-This document provides a comprehensive technical overview of the HBnB project. It consolidates architectural diagrams and explanatory notes to guide development and ensure a clear understanding of the system design.
+This document provides a technical overview of the HBnB application architecture. It consolidates diagrams and explanations to guide implementation.
 
 ---
 
 ## High-Level Architecture
 
-The HBnB application follows a layered architecture pattern. This separation improves scalability, testability, and maintainability.
-
-### High-Level Package Diagram
+The HBnB system follows a layered architecture to separate concerns and improve maintainability.
 
 ```mermaid
 classDiagram
@@ -19,20 +17,19 @@ class PersistenceLayer
 
 PresentationLayer --> BusinessLogicLayer : uses
 BusinessLogicLayer --> PersistenceLayer : persists
+
 Explanation
 
-The Presentation Layer handles API requests.
+Presentation Layer handles API requests.
 
-The Business Logic Layer contains core domain logic.
+Business Logic Layer contains core application rules.
 
-The Persistence Layer manages data storage.
+Persistence Layer manages data storage.
 
 Business Logic Layer
-This layer contains the core entities of the HBnB application.
 
-Detailed Class Diagram
-mermaid
-Copy code
+The Business Logic layer defines the core entities of the system.
+
 classDiagram
 class User {
     UUID id
@@ -43,10 +40,6 @@ class User {
     boolean is_admin
     datetime created_at
     datetime updated_at
-
-    create()
-    update()
-    delete()
 }
 
 class Place {
@@ -58,10 +51,6 @@ class Place {
     float longitude
     datetime created_at
     datetime updated_at
-
-    create()
-    update()
-    delete()
 }
 
 class Review {
@@ -70,10 +59,6 @@ class Review {
     string comment
     datetime created_at
     datetime updated_at
-
-    create()
-    update()
-    delete()
 }
 
 class Amenity {
@@ -82,34 +67,25 @@ class Amenity {
     string description
     datetime created_at
     datetime updated_at
-
-    create()
-    update()
-    delete()
 }
 
 User "1" --> "0..*" Place : owns
 User "1" --> "0..*" Review : writes
 Place "1" --> "0..*" Review : receives
 Place "0..*" --> "0..*" Amenity : has
+
 Entity Descriptions
-User
-Represents a platform user. Users can own places and write reviews.
 
-Place
-Represents a listed property. Each place belongs to one user.
+User: Represents a system user.
 
-Review
-Represents feedback left by a user on a place.
+Place: Represents a listed property.
 
-Amenity
-Represents features associated with places.
+Review: Represents feedback on a place.
+
+Amenity: Represents features associated with places.
 
 API Interaction Flow
-The following sequence demonstrates how a client retrieves places.
 
-mermaid
-Copy code
 sequenceDiagram
 Client ->> API: GET /places
 API ->> BusinessLogic: fetch_places()
@@ -117,8 +93,9 @@ BusinessLogic ->> Persistence: query_places()
 Persistence -->> BusinessLogic: places
 BusinessLogic -->> API: places
 API -->> Client: response
+
 Explanation
-This flow shows how data moves through the system layers when retrieving places.
+This sequence shows how a request flows through the system layers
 
 Conclusion
-This document serves as a blueprint for the HBnB system architecture and will guide implementation and maintenance.
+This document serves as a reference for understanding the HBnB system architecture and design.
