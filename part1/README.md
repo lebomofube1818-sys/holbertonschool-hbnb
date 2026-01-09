@@ -18,7 +18,6 @@ class Database
 API --> Facade : <<facade>>
 Facade --> Repository : data access
 ```
-```md
 ## Architecture Overview
 
 **Presentation Layer**  
