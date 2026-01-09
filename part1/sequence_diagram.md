@@ -1,7 +1,8 @@
-
 # HBnB API Sequence Diagrams
 
-## User Registration
+---
+
+##  User Registration
 
 ```mermaid
 sequenceDiagram
@@ -20,9 +21,9 @@ Notes:
 
 User data flows from API → BusinessLogic → Database
 
-New user created successfully
+New user is created successfully
 
-Place Creation
+ Place Creation
 mermaid
 Copy code
 sequenceDiagram
@@ -43,7 +44,7 @@ Adds a new rental listing
 
 Validation and persistence handled by BusinessLogic and Database
 
-Review Submission
+ Review Submission
 mermaid
 Copy code
 sequenceDiagram
@@ -84,3 +85,4 @@ Notes:
 Shows data retrieval flow
 
 Includes optional filtering logic in BusinessLogic
+
