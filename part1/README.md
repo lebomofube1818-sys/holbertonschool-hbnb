@@ -93,18 +93,39 @@ Place "0..*" --> "0..*" Amenity : has
 
 Explanation
 
-User represents system users (regular or admin).
+User: Represents system users (regular or admin). Can own Places and write Reviews.
 
-Place represents properties owned by users.
+Place: Represents properties owned by Users. Can have Reviews and Amenities.
 
-Review represents feedback left by users for places.
+Review: Represents feedback left by Users for Places.
 
-Amenity represents features associated with places.
+Amenity: Represents features associated with Places.
 
-Relationships define ownership, reviews, and amenities.
+Relationships:
+
+User “1” → Place “0..*” : owns
+
+User “1” → Review “0..*” : writes
+
+Place “1” → Review “0..*” : receives
+
+Place “0..” → Amenity “0..” : has
+
+API Interaction Flow
+
+sequenceDiagram
+Client ->> API: GET /places
+API ->> BusinessLogic: fetch_places()
+BusinessLogic ->> Persistence: query_places()
+Persistence -->> BusinessLogic: places
+BusinessLogic -->> API: places
+API -->> Client: response
+
+Explanation
+
+This sequence shows how a request flows through the system layers from Client → API → Business Logic → Persistence → back.
 
 Conclusion
 
-This document outlines the architectural structure and business logic of the HBnB
-application. The diagrams and explanations together provide a clear reference
-for future implementation phases.
+This document outlines the architectural structure and business logic of the HBnB application.
+The diagrams and explanations together provide a clear reference for implementation phases.
