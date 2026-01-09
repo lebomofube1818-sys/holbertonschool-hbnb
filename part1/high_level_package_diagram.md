@@ -1,59 +1,81 @@
+# HBnB Architecture Documentation
+
+## High-Level Package Diagram
+
+```mermaid
 classDiagram
 
-class BaseEntity {
-    +UUID id
-    +DateTime created_at
-    +DateTime updated_at
-}
-
+%% Classes with attributes and methods
 class User {
-    +String first_name
-    +String last_name
-    +String email
-    +String password
-    +Boolean is_admin
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string email
+    +string password
+    +string first_name
+    +string last_name
+    +save()
+    +to_dict()
 }
 
 class Place {
-    +String title
-    +String description
-    +Float price
-    +Float latitude
-    +Float longitude
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string name
+    +string description
+    +int number_rooms
+    +int number_bathrooms
+    +int max_guest
+    +int price_by_night
+    +save()
+    +to_dict()
 }
 
 class Review {
-    +Integer rating
-    +String comment
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string text
+    +string user_id
+    +string place_id
+    +save()
+    +to_dict()
 }
 
 class Amenity {
-    +String name
-    +String description
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string name
+    +save()
+    +to_dict()
 }
 
-BaseEntity <|-- User
-BaseEntity <|-- Place
-BaseEntity <|-- Review
-BaseEntity <|-- Amenity
+%% Relationships
+User "1" --> "*" Review : writes
+Place "1" --> "*" Review : has
+Place "*" --> "*" Amenity : includes
+Amenity "*" --> "*" Place : belongs_to
+```
+##Business Logic Layer Overview
 
-User "1" --> "0..*" Place : owns
-User "1" --> "0..*" Review : writes
-Place "1" --> "0..*" Review : has
-Place "0..*" -- "0..*" Amenity : includes
+**User**
+Represents a registered user. Stores login credentials and personal information. Responsible for writing Reviews.
+
+**Place**
+Represents a rental property. Stores attributes like rooms, bathrooms, max guests, and price. Can have multiple Reviews and multiple Amenities.
+
+**Review**
+Represents a review left by a User for a Place. Linked to both User and Place. Contains textual feedback.
+
+**Amenity**
+Represents a feature of a Place (e.g., Wi-Fi, pool). Many-to-many relationship with Place.
+
+**Relationships**
+
+User → Review: one-to-many
+
+Place → Review: one-to-many
+
+Place ↔ Amenity: many-to-many
