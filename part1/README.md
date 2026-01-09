@@ -1,4 +1,6 @@
+## High-Level Package Diagram
 
+```mermaid
 classDiagram
 
 class API
