@@ -58,21 +58,21 @@ Place "1" --> "*" Review : has
 Place "*" --> "*" Amenity : includes
 Amenity "*" --> "*" Place : belongs_to
 ```
-Business Logic Layer Overview
+##Business Logic Layer Overview
 
-User
+**User**
 Represents a registered user. Stores login credentials and personal information. Responsible for writing Reviews.
 
-Place
+**Place**
 Represents a rental property. Stores attributes like rooms, bathrooms, max guests, and price. Can have multiple Reviews and multiple Amenities.
 
-Review
+**Review**
 Represents a review left by a User for a Place. Linked to both User and Place. Contains textual feedback.
 
-Amenity
+**Amenity**
 Represents a feature of a Place (e.g., Wi-Fi, pool). Many-to-many relationship with Place.
 
-Relationships
+**Relationships**
 
 User → Review: one-to-many
 
