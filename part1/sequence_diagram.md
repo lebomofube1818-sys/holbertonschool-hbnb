@@ -48,7 +48,7 @@ Validation and persistence handled by BusinessLogic and Database
 
 ## Review Submission
 
-``mermaid
+```mermaid
 sequenceDiagram
 participant User
 participant API
