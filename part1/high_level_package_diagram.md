@@ -1,59 +1,55 @@
 classDiagram
 
-class BaseEntity {
-    +UUID id
-    +DateTime created_at
-    +DateTime updated_at
-}
-
+%% Classes with attributes and methods
 class User {
-    +String first_name
-    +String last_name
-    +String email
-    +String password
-    +Boolean is_admin
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string email
+    +string password
+    +string first_name
+    +string last_name
+    +save()
+    +to_dict()
 }
 
 class Place {
-    +String title
-    +String description
-    +Float price
-    +Float latitude
-    +Float longitude
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string name
+    +string description
+    +int number_rooms
+    +int number_bathrooms
+    +int max_guest
+    +int price_by_night
+    +save()
+    +to_dict()
 }
 
 class Review {
-    +Integer rating
-    +String comment
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string text
+    +string user_id
+    +string place_id
+    +save()
+    +to_dict()
 }
 
 class Amenity {
-    +String name
-    +String description
-
-    +create()
-    +update()
-    +delete()
+    +UUID id
+    +datetime created_at
+    +datetime updated_at
+    +string name
+    +save()
+    +to_dict()
 }
 
-BaseEntity <|-- User
-BaseEntity <|-- Place
-BaseEntity <|-- Review
-BaseEntity <|-- Amenity
+%% Relationships
+User "1" --> "*" Review : writes
+Place "1" --> "*" Review : has
+Place "*" --> "*" Amenity : includes
+Amenity "*" --> "*" Place : belongs_to
 
-User "1" --> "0..*" Place : owns
-User "1" --> "0..*" Review : writes
-Place "1" --> "0..*" Review : has
-Place "0..*" -- "0..*" Amenity : includes
