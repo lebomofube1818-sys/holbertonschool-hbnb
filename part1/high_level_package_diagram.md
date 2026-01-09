@@ -1,3 +1,8 @@
+# HBnB Architecture Documentation
+
+## High-Level Package Diagram
+
+```mermaid
 classDiagram
 
 %% Classes with attributes and methods
