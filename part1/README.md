@@ -16,8 +16,8 @@ class PresentationLayer
 class BusinessLogicLayer
 class PersistenceLayer
 
-PresentationLayer --> BusinessLogicLayer : Facade
-BusinessLogicLayer --> PersistenceLayer : Data Access
+PresentationLayer --> BusinessLogicLayer : uses
+BusinessLogicLayer --> PersistenceLayer : persists
 
 Explanation
 
