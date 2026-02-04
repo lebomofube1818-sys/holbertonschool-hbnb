@@ -4,6 +4,8 @@ This project is a backend application for the HBnB platform. It is structured us
 
 ## Project Structure
 
+```text
+
 hbnb/
 ├── app/
 │ ├── init.py # Creates and configures the Flask application
@@ -32,7 +34,7 @@ hbnb/
 ├── requirements.txt # Python dependencies
 ├── README.md # Project documentation
 
-
+---
 ## Installation
 
 1. Clone the repository:
