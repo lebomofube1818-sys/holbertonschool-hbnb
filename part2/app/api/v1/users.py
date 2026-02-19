@@ -62,3 +62,20 @@ class UserResource(Resource):
             'last_name': updated_user.last_name,
             'email': updated_user.email
         }, 200
+
+
+
+@api.route('/all')
+class UserAll(Resource):
+    @api.response(200, 'All users retrieved successfully')
+    def get(self):
+        all_users = facade.get_all_users()  # make sure this exists in your facade
+        return [
+            {
+                'id': u.id,
+                'first_name': u.first_name,
+                'last_name': u.last_name,
+                'email': u.email
+            } for u in all_users
+        ], 200
+
