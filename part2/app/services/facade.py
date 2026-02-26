@@ -1,6 +1,8 @@
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.amenity import Amenity
+from app.models.review import Review
+from app.models.place import Place
 
 class HBnBFacade:
     def __init__(self):
@@ -9,6 +11,7 @@ class HBnBFacade:
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
 
+    # ---------------- User Methods ----------------
     def create_user(self, user_data):
         user = User(**user_data)
         self.user_repo.add(user)
@@ -20,7 +23,10 @@ class HBnBFacade:
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
 
-    # Placeholder methods for later tasks
+    def get_all_users(self):
+        return self.user_repo.get_all()
+
+    # ---------------- Amenity Methods ----------------
     def create_amenity(self, amenity_data):
         amenity = Amenity(**amenity_data)
         self.amenity_repo.add(amenity)
@@ -34,3 +40,68 @@ class HBnBFacade:
 
     def update_amenity(self, amenity_id, amenity_data):
         return self.amenity_repo.update(amenity_id, amenity_data)
+
+    # ---------------- Review Methods ----------------
+    def create_review(self, review_data):
+        user = self.user_repo.get(review_data['user_id'])
+        place = self.place_repo.get(review_data['place_id'])
+
+        if not user:
+            raise ValueError(f"User with id {review_data['user_id']} does not exist")
+        if not place:
+            raise ValueError(f"Place with id {review_data['place_id']} does not exist")
+
+        review = Review(
+            text=review_data['text'],
+            rating=review_data['rating'],
+            place=place,
+            user=user
+        )
+
+        self.review_repo.add(review)
+
+        # Add review to the place's collection
+        if not hasattr(place, "reviews"):
+            place.reviews = []
+        place.reviews.append(review)
+
+        return review
+
+    def get_review(self, review_id):
+        return self.review_repo.get(review_id)
+
+    def get_all_reviews(self):
+        return self.review_repo.get_all()
+
+    def get_reviews_by_place(self, place_id):
+        place = self.place_repo.get(place_id)
+        if not place:
+            return None
+        return getattr(place, "reviews", [])
+
+    def update_review(self, review_id, review_data):
+        review = self.review_repo.get(review_id)
+        if not review:
+            return None
+
+        if 'text' in review_data:
+            review.text = review_data['text']
+        if 'rating' in review_data:
+            if review_data['rating'] not in [1,2,3,4,5]:
+                raise ValueError("Rating must be 1-5")
+            review.rating = review_data['rating']
+        review.save()
+        return review
+
+    def delete_review(self, review_id):
+        review = self.review_repo.get(review_id)
+        if not review:
+            return None
+        self.review_repo.remove(review)
+        if hasattr(review.place, "reviews") and review in review.place.reviews:
+            review.place.reviews.remove(review)
+        return review
+
+# Create a single instance of HBnBFacade to use across your app
+facade = HBnBFacade()
+

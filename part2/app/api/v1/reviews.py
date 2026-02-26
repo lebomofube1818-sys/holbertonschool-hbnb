@@ -1,100 +1,63 @@
 from flask_restx import Namespace, Resource, fields
-from app.models.place import Place
-from app.models.user import User
+from app.services import facade
 
-api = Namespace('places', description='Place related operations')
+api = Namespace('reviews', description='Review operations')
 
-# API model for serialization
-place_model = api.model('Place', {
-    'id': fields.String(readonly=True),
-    'title': fields.String(required=True, description='Place title'),
-    'description': fields.String(description='Place description'),
-    'price': fields.Float(required=True, description='Price of the place'),
-    'latitude': fields.Float(required=True, description='Latitude'),
-    'longitude': fields.Float(required=True, description='Longitude'),
-    'owner_id': fields.String(required=True, description='ID of the owner user'),
-    'reviews': fields.List(fields.Raw, description='List of reviews for this place')
+# Review model for API validation and serialization
+review_model = api.model('Review', {
+    'id': fields.String(readonly=True, description='Review ID'),
+    'text': fields.String(required=True, description='Text of the review'),
+    'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
+    'user_id': fields.String(required=True, description='ID of the user'),
+    'place_id': fields.String(required=True, description='ID of the place')
 })
 
-# Temporary in-memory storage for Place objects
-places_list = []
-
-# Helper function to find user by id
-def get_user_by_id(user_id):
-    for user in User.all_users:  # assumes User class keeps a list of all users
-        if user.id == user_id:
-            return user
-    return None
-
-# Helper function to find place by id
-def get_place_by_id(place_id):
-    for place in places_list:
-        if place.id == place_id:
-            return place
-    return None
-
 @api.route('/')
-class PlaceList(Resource):
-    @api.marshal_list_with(place_model)
-    def get(self):
-        """Get all places including their reviews"""
-        result = []
-        for place in places_list:
-            place_data = place.__dict__.copy()
-            # Include reviews as a list of dicts
-            place_data['reviews'] = [r.__dict__ for r in getattr(place, 'reviews', [])]
-            result.append(place_data)
-        return result
-
-    @api.expect(place_model)
-    @api.marshal_with(place_model, code=201)
+class ReviewList(Resource):
+    @api.expect(review_model, validate=True)
+    @api.marshal_with(review_model, code=201)
     def post(self):
-        """Create a new place"""
+        """Register a new review"""
         data = api.payload
-        owner = get_user_by_id(data['owner_id'])
-        if not owner:
-            api.abort(400, f"User with id {data['owner_id']} does not exist")
+        try:
+            review = facade.create_review(data)
+        except ValueError as e:
+            api.abort(400, str(e))
+        return review.__dict__, 201
 
-        new_place = Place(
-            title=data['title'],
-            description=data.get('description', ''),
-            price=data['price'],
-            latitude=data['latitude'],
-            longitude=data['longitude'],
-            owner=owner
-        )
-        places_list.append(new_place)
-        return new_place, 201
+    @api.marshal_list_with(review_model)
+    def get(self):
+        """Retrieve a list of all reviews"""
+        reviews = facade.get_all_reviews()
+        return [r.__dict__ for r in reviews], 200
 
-@api.route('/<string:place_id>')
-class PlaceDetail(Resource):
-    @api.marshal_with(place_model)
-    def get(self, place_id):
-        """Get a specific place by ID"""
-        place = get_place_by_id(place_id)
-        if not place:
-            api.abort(404, f"Place with id {place_id} not found")
-        # Include reviews in this single place response
-        place_data = place.__dict__.copy()
-        place_data['reviews'] = [r.__dict__ for r in getattr(place, 'reviews', [])]
-        return place_data
+@api.route('/<string:review_id>')
+class ReviewResource(Resource):
+    @api.marshal_with(review_model)
+    def get(self, review_id):
+        """Get review details by ID"""
+        review = facade.get_review(review_id)
+        if not review:
+            api.abort(404, f"Review with id {review_id} not found")
+        return review.__dict__
 
-    @api.expect(place_model)
-    @api.marshal_with(place_model)
-    def put(self, place_id):
-        """Update a specific place by ID"""
-        place = get_place_by_id(place_id)
-        if not place:
-            api.abort(404, f"Place with id {place_id} not found")
-
+    @api.expect(review_model, validate=True)
+    @api.marshal_with(review_model)
+    def put(self, review_id):
+        """Update a review's information"""
         data = api.payload
-        if 'owner_id' in data:
-            owner = get_user_by_id(data['owner_id'])
-            if not owner:
-                api.abort(400, f"User with id {data['owner_id']} does not exist")
-            data['owner'] = owner
-            del data['owner_id']
+        try:
+            review = facade.update_review(review_id, data)
+        except ValueError as e:
+            api.abort(400, str(e))
+        if not review:
+            api.abort(404, f"Review with id {review_id} not found")
+        return review.__dict__
 
-        place.update(data)
-        return place
+    def delete(self, review_id):
+        """Delete a review"""
+        review = facade.delete_review(review_id)
+        if not review:
+            api.abort(404, f"Review with id {review_id} not found")
+        return {"message": "Review deleted successfully"}, 200
 

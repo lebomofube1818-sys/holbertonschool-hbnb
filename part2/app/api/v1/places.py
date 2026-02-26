@@ -1,8 +1,16 @@
 from flask_restx import Namespace, Resource, fields
 from app.models.place import Place
-from app.models.user import User
+from app.services.facade import facade
 
 api = Namespace('places', description='Place related operations')
+
+# API model for reviews inside a place
+review_model = api.model('PlaceReview', {
+    'id': fields.String(description='Review ID'),
+    'text': fields.String(description='Text of the review'),
+    'rating': fields.Integer(description='Rating of the place (1-5)'),
+    'user_id': fields.String(description='ID of the user')
+})
 
 # API model for serialization
 place_model = api.model('Place', {
@@ -12,18 +20,12 @@ place_model = api.model('Place', {
     'price': fields.Float(required=True, description='Price of the place'),
     'latitude': fields.Float(required=True, description='Latitude'),
     'longitude': fields.Float(required=True, description='Longitude'),
-    'owner_id': fields.String(required=True, description='ID of the owner user')
+    'owner_id': fields.String(required=True, description='ID of the owner user'),
+    'reviews': fields.List(fields.Nested(review_model), description='List of reviews for this place')
 })
 
 # Temporary in-memory storage for Place objects
 places_list = []
-
-# Helper function to find user by id
-def get_user_by_id(user_id):
-    for user in User.all_users:  # assumes User class keeps a list of all users
-        if user.id == user_id:
-            return user
-    return None
 
 # Helper function to find place by id
 def get_place_by_id(place_id):
@@ -36,15 +38,23 @@ def get_place_by_id(place_id):
 class PlaceList(Resource):
     @api.marshal_list_with(place_model)
     def get(self):
-        """Get all places"""
-        return places_list
+        """Get all places including their reviews"""
+        result = []
+        for place in places_list:
+            place_data = place.__dict__.copy()
+            # Include reviews as a list of dicts
+            place_data['reviews'] = [r.__dict__ for r in getattr(place, 'reviews', [])]
+            result.append(place_data)
+        return result
 
     @api.expect(place_model)
     @api.marshal_with(place_model, code=201)
     def post(self):
         """Create a new place"""
         data = api.payload
-        owner = get_user_by_id(data['owner_id'])
+
+        # Use facade to get the user by ID
+        owner = facade.get_user(data['owner_id'])
         if not owner:
             api.abort(400, f"User with id {data['owner_id']} does not exist")
 
@@ -56,6 +66,7 @@ class PlaceList(Resource):
             longitude=data['longitude'],
             owner=owner
         )
+
         places_list.append(new_place)
         return new_place, 201
 
@@ -67,7 +78,10 @@ class PlaceDetail(Resource):
         place = get_place_by_id(place_id)
         if not place:
             api.abort(404, f"Place with id {place_id} not found")
-        return place
+
+        place_data = place.__dict__.copy()
+        place_data['reviews'] = [r.__dict__ for r in getattr(place, 'reviews', [])]
+        return place_data
 
     @api.expect(place_model)
     @api.marshal_with(place_model)
@@ -79,7 +93,7 @@ class PlaceDetail(Resource):
 
         data = api.payload
         if 'owner_id' in data:
-            owner = get_user_by_id(data['owner_id'])
+            owner = facade.get_user(data['owner_id'])
             if not owner:
                 api.abort(400, f"User with id {data['owner_id']} does not exist")
             data['owner'] = owner
@@ -87,4 +101,18 @@ class PlaceDetail(Resource):
 
         place.update(data)
         return place
+
+@api.route('/<string:place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.marshal_list_with(fields.Raw)
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+        place = get_place_by_id(place_id)
+        if not place:
+            api.abort(404, f"Place with id {place_id} not found")
+
+        reviews = facade.get_reviews_by_place(place_id)
+        return [r.__dict__ for r in reviews], 200
 
