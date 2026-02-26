@@ -59,3 +59,23 @@ class Place:
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()
+
+class Place:
+    def __init__(self, title, price, latitude, longitude):
+        if not title or not title.strip():
+            raise ValueError("title cannot be empty")
+
+        if price <= 0:
+            raise ValueError("price must be positive")
+
+        if not (-90 <= latitude <= 90):
+            raise ValueError("latitude out of range")
+
+        if not (-180 <= longitude <= 180):
+            raise ValueError("longitude out of range")
+
+        self.id = str(uuid.uuid4())
+        self.title = title
+        self.price = price
+        self.latitude = latitude
+        self.longitude = longitude

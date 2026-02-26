@@ -4,6 +4,7 @@ from app.models.amenity import Amenity
 from app.models.review import Review
 from app.models.place import Place
 
+
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
@@ -25,6 +26,30 @@ class HBnBFacade:
 
     def get_all_users(self):
         return self.user_repo.get_all()
+
+    def update_user(self, user_id, user_data):
+        """Update an existing user"""
+        user = self.user_repo.get(user_id)
+        if not user:
+            return None
+
+        # Prevent duplicate email
+        if 'email' in user_data:
+            existing_user = self.user_repo.get_by_attribute('email', user_data['email'])
+            if existing_user and existing_user.id != user_id:
+                raise ValueError("Email already registered")
+
+        # Update fields
+        if 'first_name' in user_data:
+            user.first_name = user_data['first_name']
+
+        if 'last_name' in user_data:
+            user.last_name = user_data['last_name']
+
+        if 'email' in user_data:
+            user.email = user_data['email']
+
+        return user
 
     # ---------------- Amenity Methods ----------------
     def create_amenity(self, amenity_data):
@@ -60,7 +85,6 @@ class HBnBFacade:
 
         self.review_repo.add(review)
 
-        # Add review to the place's collection
         if not hasattr(place, "reviews"):
             place.reviews = []
         place.reviews.append(review)
@@ -86,10 +110,12 @@ class HBnBFacade:
 
         if 'text' in review_data:
             review.text = review_data['text']
+
         if 'rating' in review_data:
-            if review_data['rating'] not in [1,2,3,4,5]:
+            if review_data['rating'] not in [1, 2, 3, 4, 5]:
                 raise ValueError("Rating must be 1-5")
             review.rating = review_data['rating']
+
         review.save()
         return review
 
@@ -97,11 +123,14 @@ class HBnBFacade:
         review = self.review_repo.get(review_id)
         if not review:
             return None
+
         self.review_repo.remove(review)
+
         if hasattr(review.place, "reviews") and review in review.place.reviews:
             review.place.reviews.remove(review)
+
         return review
+
 
 # Create a single instance of HBnBFacade to use across your app
 facade = HBnBFacade()
-

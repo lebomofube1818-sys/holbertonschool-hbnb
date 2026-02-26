@@ -22,7 +22,7 @@ class ReviewList(Resource):
         try:
             review = facade.create_review(data)
         except ValueError as e:
-            api.abort(400, str(e))
+            return {"error": str(e)}, 400
         return review.__dict__, 201
 
     @api.marshal_list_with(review_model)
@@ -49,7 +49,7 @@ class ReviewResource(Resource):
         try:
             review = facade.update_review(review_id, data)
         except ValueError as e:
-            api.abort(400, str(e))
+            return {"error": str(e)}, 400
         if not review:
             api.abort(404, f"Review with id {review_id} not found")
         return review.__dict__
@@ -60,4 +60,3 @@ class ReviewResource(Resource):
         if not review:
             api.abort(404, f"Review with id {review_id} not found")
         return {"message": "Review deleted successfully"}, 200
-
