@@ -1,1 +1,60 @@
-# Part 3 - Project Description
+# HBnB Project
+
+This project is a backend application for the HBnB platform. It is structured using a layered architecture (API, Business Logic, and Persistence) and follows clean separation of concerns.
+
+## Project Structure
+
+```text
+
+hbnb/
+├── app/
+│ ├── init.py # Creates and configures the Flask application
+│ ├── api/ # Presentation layer (API endpoints)
+│ │ ├── init.py
+│ │ ├── v1/ # Version 1 of the API
+│ │ ├── init.py
+│ │ ├── users.py # User-related endpoints
+│ │ ├── places.py # Place-related endpoints
+│ │ ├── reviews.py # Review-related endpoints
+│ │ ├── amenities.py # Amenity-related endpoints
+│ ├── models/ # Business logic and domain models
+│ │ ├── init.py
+│ │ ├── user.py
+│ │ ├── place.py
+│ │ ├── review.py
+│ │ ├── amenity.py
+│ ├── services/ # Facade layer coordinating business logic
+│ │ ├── init.py
+│ │ ├── facade.py
+│ ├── persistence/ # Data access layer
+│ ├── init.py
+│ ├── repository.py # In-memory repository implementation
+├── run.py # Application entry point
+├── config.py # Application configuration
+├── requirements.txt # Python dependencies
+├── README.md # Project documentation
+
+---
+## Installation
+
+1. Clone the repository:
+git clone <repository_url>
+cd hbnb
+
+
+2. Create and activate a virtual environment:
+python3 -m venv venv
+source venv/bin/activate
+
+
+3. Install dependencies:
+pip install -r requirements.txt
+
+
+## Running the Application
+
+Run the application using:
+python3 run.py
+
+
+The Flask application will start in development mode.
