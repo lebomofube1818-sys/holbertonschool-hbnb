@@ -1,3 +1,5 @@
+from app import db
+from .base_model import BaseModel
 import uuid
 import re
 from datetime import datetime
@@ -5,7 +7,16 @@ from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt()
 
-class User:
+class User(BaseModel):
+
+    __tablename__ = "users"
+
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
     all_users = {}   # in-memory storage
 
     def __init__(self, first_name, last_name, email, password, is_admin=False):
@@ -49,7 +60,7 @@ class User:
     def update(self, data):
         for key, value in data.items():
             if key == "password":
-                self.hash_password(value)  # never store plaintext via update
+                self.hash_password(value)
             elif hasattr(self, key):
                 setattr(self, key, value)
         self.save()
