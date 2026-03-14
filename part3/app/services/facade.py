@@ -1,3 +1,4 @@
+# app/services/facade.py
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.amenity import Amenity
@@ -19,6 +20,21 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
+
+    def update_user(self, user_id, user_data):
+        user = self.get_user(user_id)
+        if not user:
+            return None
+
+        # Update only the fields provided
+        for key, value in user_data.items():
+            if hasattr(user, key):
+                setattr(user, key, value)
+
+        # Save changes back to repository
+        self.user_repo.update(user)  # <-- only pass the user object
+
+        return user
 
     # Placeholder methods for later tasks
     def create_amenity(self, amenity_data):

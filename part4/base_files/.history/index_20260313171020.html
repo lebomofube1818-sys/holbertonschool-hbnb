@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBNB - Places</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <img src="images/logo.png" alt="HBNB Logo" class="logo">
+            <nav class="navbar">
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+            </nav>
+            <a href="login.html" class="login-button" id>Login</a>
+        </div>
+    </header>
+
+    <main>
+        <h1>Available Places</h1>
+        <section id="filter" class="filter-section">
+            <label for="price-filter">Max Price:</label>
+            <select id="price-filter" class="price-filter">
+                <option value="all">All</option>
+                <option value="100">M100</option>
+                <option value="150">M150</option>
+                <option value="200">M200</option>
+                <option value="300">M300</option>
+            </select>
+        </section>
+
+        <section id="places-list" class="places-list">
+            <!-- Sample place cards (will be replaced by dynamic data) -->
+            <div class="place-card">
+                <img src="images/beach_house.jpg" alt="Beautiful Beach House" class="place-image">
+                <div class="place-info">
+                    <h3>Beautiful Beach House</h3>
+                    <p class="price">Price per night: <span>M100</span></p>
+                    <button class="details-button" onclick="location.href='place.html?id=1'">View Details</button>
+                </div>
+            </div>
+            <div class="place-card">
+                <img src="images/cozy_cabin.jpg" alt="Cozy Cabin" class="place-image">
+                <div class="place-info">
+                    <h3>Cozy Cabin</h3>
+                    <p class="price">Price per night: <span>M150</span></p>
+                    <button class="details-button" onclick="location.href='place.html?id=2'">View Details</button>
+                </div>
+            </div>
+            <div class="place-card">
+                <img src="images/modern_apt.jpg" alt="Modern Apartment" class="place-image">
+                <div class="place-info">
+                    <h3>Modern Apartment</h3>
+                    <p class="price">Price per night: <span>M200</span></p>
+                    <button class="details-button" onclick="location.href='place.html?id=3'">View Details</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 HBNB. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

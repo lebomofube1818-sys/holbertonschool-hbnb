@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBNB - Place Details</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <img src="images/logo.png" alt="HBNB Logo" class="logo">
+            <nav class="navbar">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+            </nav>
+            <a href="login.html" class="login-button">Login</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="place-details" class="place-details">
+            <h1>Beautiful Beach House</h1>
+            <div class="place-info">
+                <p><strong>Host:</strong> John Doe</p>
+                <p><strong>Price per night:</strong> $150</p>
+                <p><strong>Description:</strong> A beautiful beach house with amazing views...</p>
+                <p><strong>Amenities:</strong> WiFi, Pool, Air Conditioning</p>
+            </div>
+        </section>
+
+        <section id="reviews" class="reviews-section">
+            <h2>Reviews</h2>
+            <div class="reviews-list">
+                <div class="review-card">
+                    <p class="review-text">Great place to stay!</p>
+                    <p class="review-user"><strong>Jane Smith</strong></p>
+                    <p class="review-rating">★★★★☆</p>
+                </div>
+                <div class="review-card">
+                    <p class="review-text">Amazing location and very comfortable.</p>
+                    <p class="review-user"><strong>Robert Brown</strong></p>
+                    <p class="review-rating">★★★★★</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Review form (shown if logged in) -->
+        <section id="add-review" class="add-review-section">
+            <h2>Add a Review</h2>
+            <form id="review-form" class="add-review form">
+                <div class="form-group">
+                    <label for="review-text">Your Review:</label>
+                    <textarea id="review-text" name="review-text" rows="4" required placeholder="Write your review here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="rating">Rating:</label>
+                    <select id="rating" name="rating" required>
+                        <option value="1">1 Star</option>
+                        <option value="2">2 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="5">5 Stars</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-button">Submit Review</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 HBNB. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

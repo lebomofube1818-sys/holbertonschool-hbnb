@@ -1,7 +1,6 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import create_access_token
-from app.services import facade
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from app.services import facade  # <- shared singleton
 
 api = Namespace('auth', description='Authentication operations')
 
@@ -10,33 +9,32 @@ login_model = api.model('Login', {
     'password': fields.String(required=True, description='User password')
 })
 
-
 @api.route('/login')
 class Login(Resource):
 
-    @api.expect(login_model)
+    @api.expect(login_model, validate=True)
     def post(self):
         """Authenticate user and return JWT"""
 
         credentials = api.payload
+        email = credentials.get('email')
+        password = credentials.get('password')
 
-        # Step 1: find user
-        user = facade.get_user_by_email(credentials['email'])
+        if not email or not password:
+            return {"error": "Email and password are required"}, 400
 
-        # Step 2: verify password
-        if not user or not user.verify_password(credentials['password']):
+        user = facade.get_user_by_email(email)  # uses shared facade
+
+        if not user or not user.verify_password(password):
             return {"error": "Invalid credentials"}, 401
 
-        # Step 3: create token
         access_token = create_access_token(
             identity=str(user.id),
-            additional_claims={
-                "is_admin": user.is_admin
-            }
+            additional_claims={"is_admin": user.is_admin}
         )
 
-        # Step 4: return token
         return {"access_token": access_token}, 200
+
 @api.route('/protected')
 class Protected(Resource):
 
