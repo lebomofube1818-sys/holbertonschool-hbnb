@@ -42,7 +42,6 @@ class PlaceList(Resource):
         result = []
         for place in places_list:
             place_data = place.__dict__.copy()
-            # Include reviews as a list of dicts
             place_data['reviews'] = [r.__dict__ for r in getattr(place, 'reviews', [])]
             result.append(place_data)
         return result
@@ -53,22 +52,25 @@ class PlaceList(Resource):
         """Create a new place"""
         data = api.payload
 
-        # Use facade to get the user by ID
-        owner = facade.get_user(data['owner_id'])
-        if not owner:
-            api.abort(400, f"User with id {data['owner_id']} does not exist")
+        try:
+            owner = facade.get_user(data['owner_id'])
+            if not owner:
+                api.abort(400, f"User with id {data['owner_id']} does not exist")
 
-        new_place = Place(
-            title=data['title'],
-            description=data.get('description', ''),
-            price=data['price'],
-            latitude=data['latitude'],
-            longitude=data['longitude'],
-            owner=owner
-        )
+            new_place = Place(
+                title=data['title'],
+                description=data.get('description', ''),
+                price=data['price'],
+                latitude=data['latitude'],
+                longitude=data['longitude'],
+                owner=owner
+            )
 
-        places_list.append(new_place)
-        return new_place, 201
+            places_list.append(new_place)
+            return new_place, 201
+
+        except ValueError as e:
+            return {"error": str(e)}, 400
 
 @api.route('/<string:place_id>')
 class PlaceDetail(Resource):
@@ -92,15 +94,20 @@ class PlaceDetail(Resource):
             api.abort(404, f"Place with id {place_id} not found")
 
         data = api.payload
-        if 'owner_id' in data:
-            owner = facade.get_user(data['owner_id'])
-            if not owner:
-                api.abort(400, f"User with id {data['owner_id']} does not exist")
-            data['owner'] = owner
-            del data['owner_id']
 
-        place.update(data)
-        return place
+        try:
+            if 'owner_id' in data:
+                owner = facade.get_user(data['owner_id'])
+                if not owner:
+                    api.abort(400, f"User with id {data['owner_id']} does not exist")
+                data['owner'] = owner
+                del data['owner_id']
+
+            place.update(data)
+            return place
+
+        except ValueError as e:
+            return {"error": str(e)}, 400
 
 @api.route('/<string:place_id>/reviews')
 class PlaceReviewList(Resource):
@@ -115,4 +122,3 @@ class PlaceReviewList(Resource):
 
         reviews = facade.get_reviews_by_place(place_id)
         return [r.__dict__ for r in reviews], 200
-

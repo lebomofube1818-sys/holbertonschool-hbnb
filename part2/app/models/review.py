@@ -34,3 +34,19 @@ class Review:
             if hasattr(self, key):
                 setattr(self, key, value)
         self.save()
+
+class Review:
+    def __init__(self, text, user_id, place_id, storage):
+        if not text or not text.strip():
+            raise ValueError("text cannot be empty")
+
+        if not storage.get_user(user_id):
+            raise ValueError("Invalid user_id")
+
+        if not storage.get_place(place_id):
+            raise ValueError("Invalid place_id")
+
+        self.id = str(uuid.uuid4())
+        self.text = text
+        self.user_id = user_id
+        self.place_id = place_id
