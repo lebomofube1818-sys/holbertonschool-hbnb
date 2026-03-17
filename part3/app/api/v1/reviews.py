@@ -127,8 +127,10 @@ class ReviewDetail(Resource):
         if not review:
             api.abort(404, "Review not found")
 
-        # Ownership check
-        if review.user.id != current_user_id:
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+
+        if not is_admin and review.user.id != current_user_id:
             api.abort(403, "Unauthorized action")
 
         data = api.payload
@@ -158,7 +160,10 @@ class ReviewDetail(Resource):
         if not review:
             api.abort(404, "Review not found")
 
-        if review.user.id != current_user_id:
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
+
+        if not is_admin and review.user.id != current_user_id:
             api.abort(403, "Unauthorized action")
 
         reviews_list.remove(review)

@@ -90,9 +90,11 @@ class PlaceDetail(Resource):
         if not place:
             api.abort(404, f"Place with id {place_id} not found")
 
-        if place.owner.id != current_user_id:
-            api.abort(403, "Unauthorized action")
+        claims = get_jwt()
+        is_admin = claims.get("is_admin", False)
 
+        if not is_admin and place.owner.id != current_user_id:
+            api.abort(403, "Unauthorized action")
         data = api.payload
 
         # Prevent owner change
