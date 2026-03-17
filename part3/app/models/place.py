@@ -1,11 +1,27 @@
+#!/usr/bin/python3
+"""Place model"""
+
 import uuid
 from datetime import datetime
+from app import db
 from app.models.user import User
 from app.models.amenity import Amenity
 
-class Place:
-    # global registry of all Place instances
-    all_places = {}  # key = place.id, value = Place instance
+class Place(db.Model):
+    """SQLAlchemy model for Place"""
+
+    __tablename__ = 'places'
+    all_places = {}
+
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(255), nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    owner_id = db.Column(db.String(36), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     def __init__(self, title, description, price, latitude, longitude, owner):
         self.id = str(uuid.uuid4())
@@ -73,3 +89,4 @@ class Place:
 # Helper function for other endpoints
 def get_place_by_id(place_id):
     return Place.all_places.get(place_id)
+
