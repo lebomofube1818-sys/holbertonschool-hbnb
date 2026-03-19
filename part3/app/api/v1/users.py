@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
+from app import bcrypt  # make sure bcrypt is imported
 
 api = Namespace('users', description='User operations')
 
@@ -20,34 +21,35 @@ user_update_model = api.model('UserUpdate', {
     'password': fields.String(required=False)
 })
 
+
 @api.route('/')
 class UserList(Resource):
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
-    @jwt_required()
     def post(self):
-        claims = get_jwt()
-        if not claims.get("is_admin"):
-            return {"error": "Admin privileges required"}, 403
+    """Public endpoint for user registration (no JWT required)"""
+    user_data = api.payload
 
-        user_data = api.payload
-        existing_user = facade.get_user_by_email(user_data['email'])
-        if existing_user:
-            return {'error': 'Email already registered'}, 400
+    existing_user = facade.get_user_by_email(user_data['email'])
+    if existing_user:
+        return {'error': 'Email already registered'}, 400
 
-        new_user = facade.create_user(user_data)
-        return {
-            'id': new_user.id,
-            'message': 'User successfully created'
-        }, 201
+    new_user = facade.create_user(user_data)
+    return {
+        'id': new_user.id,
+        'email': new_user.email,
+        'message': 'User successfully created'
+    }, 201
 
 
 @api.route('/<user_id>')
 class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
+    @jwt_required()
     def get(self, user_id):
+        """Get user details (JWT required)"""
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -65,6 +67,7 @@ class UserResource(Resource):
     @api.response(400, 'Invalid input data')
     @jwt_required()
     def put(self, user_id):
+        """Update user (JWT + admin privileges required)"""
         claims = get_jwt()
         if not claims.get("is_admin"):
             return {"error": "Admin privileges required"}, 403
